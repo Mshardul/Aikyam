@@ -8,6 +8,19 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/app_bar_main">
 
+    <com.synnapps.carouselview.CarouselView
+        android:id="@+id/carouselView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:fillColor="#FFFFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:pageColor="#00000000"
+        app:radius="6dp"
+        app:slideInterval="3000"
+        app:strokeColor="#FF777777"
+        app:strokeWidth="1dp"
+        tools:layout_editor_absoluteX="0dp" />
+
 
 
 </android.support.constraint.ConstraintLayout>
