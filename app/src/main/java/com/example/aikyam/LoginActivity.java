@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -29,6 +31,8 @@ import butterknife.ButterKnife;
  */
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login";
+    RadioGroup radioGroup;
+    RadioButton radioButton;
     // Progress Dialog Object
     ProgressDialog prgDialog;
     // Error Msg TextView Object
@@ -47,6 +51,8 @@ public class LoginActivity extends AppCompatActivity {
         emailET = (EditText)findViewById(R.id.email);
         // Find Password Edit View control by ID
         pwdET = (EditText)findViewById(R.id.password);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+
         // Instantiate Progress Dialog object
         prgDialog = new ProgressDialog(this);
        // Toolbar toolbar = findViewById(R.id.toolbar);
@@ -71,6 +77,15 @@ public class LoginActivity extends AppCompatActivity {
         String password = pwdET.getText().toString();
         // Instantiate Http Request Param Object
         RequestParams params = new RequestParams();
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+
+        // find the radiobutton by returned id
+        radioButton = (RadioButton) findViewById(selectedId);
+        String type;
+        if(radioButton.getText()=="Donor")
+            type="1";
+        else
+            type="2";
         // When Email Edit View and Password Edit View have values other than Null
         if(Utility.isNotNull(email) && Utility.isNotNull(password)){
             // When Email entered is Valid
@@ -79,6 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                 params.put("username", email);
                 // Put Http parameter password with value of Password Edit Value control
                 params.put("password", password);
+                params.put("type",type);
                 // Invoke RESTful Web Service with Http parameters
                 invokeWS(params);
             }

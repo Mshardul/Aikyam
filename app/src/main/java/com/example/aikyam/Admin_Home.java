@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,23 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.synnapps.carouselview.*;
-//import com.squareup.picasso.Picasso;
-import android.widget.ImageView;
-import android.widget.Toast;
-import android.widget.Button;
+import android.content.Intent;
 
-public class MainActivity extends AppCompatActivity
+public class Admin_Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    CarouselView carouselView;
-    CarouselView customCarouselView;
-
-    int[] sampleImages = {R.drawable.image_1, R.drawable.image_2, R.drawable.image_3, R.drawable.image_4, R.drawable.image_5};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_admin__home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -50,27 +41,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        carouselView = (CarouselView) findViewById(R.id.carouselView);
-        carouselView.setPageCount(sampleImages.length);
-
-        carouselView.setImageListener(imageListener);
-        carouselView.setImageClickListener(new ImageClickListener() {
-            @Override
-            public  void onClick(int position) {
-                Toast.makeText(MainActivity.this, "Clicked item: "+ position, Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
-    ImageListener imageListener = new ImageListener() {
-        @Override
-        public  void setImageForPosition(int position, ImageView imageView) {
-
-            //Picasso.with(getApplicationContext()).load(sampleNetworkImageURLs[position]).placeholder(sampleImages[0]).error(sampleImages[3]).fit().centerCrop().into(imageView);
-
-            imageView.setImageResource(sampleImages[position]);
-        }
-    };
 
     @Override
     public void onBackPressed() {
@@ -85,7 +56,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.admin__home, menu);
         return true;
     }
 
@@ -97,14 +68,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_login) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        if (id == R.id.action_admin) {
-            Intent intent = new Intent(this, Admin_Home.class);
-            startActivity(intent);
+        if (id == R.id.action_settings) {
             return true;
         }
 
@@ -117,13 +81,16 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.about) {
-            // Handle the camera action
-        } else if (id == R.id.events) {
+        if (id == R.id.create_event) {
+            Intent intent = new Intent(this, Create_Event.class);
+            startActivity(intent);
+            return true;
+        }
+        else if (id == R.id.nav_gallery) {
 
-        } else if (id == R.id.rate) {
+        } else if (id == R.id.nav_slideshow) {
 
-        } else if (id == R.id.settings) {
+        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 

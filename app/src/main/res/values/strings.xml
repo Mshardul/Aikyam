@@ -6,6 +6,8 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_login">Login/SignUp</string>
+    <string name="action_admin">Admin</string>
+    <string name="date">Select Date</string>
     <string name="title_activity_intent">IntentActivity</string>
     <string name="title_activity_login">Login</string>
     <!-- Strings related to login -->
@@ -36,7 +38,9 @@
     <string name="email">Email</string>
 
     <string name="pwd">Password</string>
-
+    <string name="tag">When in doubt, help out.</string>
     <string name="btnRegister">Register</string>
     <string name="title_activity_signup">Register</string>
+    <string name="title_activity_admin__home">Admin_Home</string>
+    <string name="title_activity_create__event">Create_Event</string>
 </resources>

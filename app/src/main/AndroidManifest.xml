@@ -15,9 +15,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Create_Event"
+            android:label="@string/title_activity_create__event"
+            android:parentActivityName=".Admin_Home"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.aikyam.Admin_Home" />
+        </activity>
+        <activity
+            android:name=".Admin_Home"
+            android:label="@string/title_activity_admin__home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".Home"
             android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Signup"
             android:label="@string/title_activity_signup"

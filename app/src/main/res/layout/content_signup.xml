@@ -121,7 +121,29 @@
                     android:inputType="textPassword"
                     android:hint="Re-enter Password"/>
             </android.support.design.widget.TextInputLayout>
+            <RadioGroup
+                android:id="@+id/radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_above="@+id/reEnterPassword" >
 
+                <RadioButton
+                    android:id="@+id/donor"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="40dp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Donor" />
+
+                <RadioButton
+                    android:id="@+id/receiver"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Receiver" />
+            </RadioGroup>
             <!-- Error message -->
 
             <TextView
@@ -134,6 +156,7 @@
             android:textStyle="bold" />
 
             <!-- Signup Button -->
+
             <android.support.v7.widget.AppCompatButton
                 android:id="@+id/btn_signup"
                 android:layout_width="fill_parent"

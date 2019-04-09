@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
@@ -29,7 +31,8 @@ import cz.msebera.android.httpclient.Header;
 public class Signup extends AppCompatActivity {
     private static final String TAG = "Signup";
 
-
+    RadioGroup radioGroup;
+    RadioButton radioButton;
     ProgressDialog prgDialog;
     TextView errorMsg;
     EditText nameT;
@@ -56,6 +59,7 @@ public class Signup extends AppCompatActivity {
         reEnterPassword=(EditText)findViewById(R.id.reEnterPassword);
         signupButton=(Button)findViewById(R.id.btn_signup);
         loginLink=(TextView)findViewById(R.id.link_login);
+        radioGroup = (RadioGroup) findViewById(R.id.radio_group);
         Toolbar toolbar = findViewById(R.id.toolbar);
         prgDialog = new ProgressDialog(this);
         // Set Progress Dialog Text
@@ -80,6 +84,17 @@ public class Signup extends AppCompatActivity {
         String phone = phoneT.getText().toString();
         String password = passwordT.getText().toString();
         String rePass=reEnterPassword.getText().toString();
+        int selectedId = radioGroup.getCheckedRadioButtonId();
+
+        // find the radiobutton by returned id
+        radioButton = (RadioButton) findViewById(selectedId);
+        String type;
+        if(radioButton.getText()=="Donor")
+            type="1";
+        else
+            type="2";
+
+
         // Instantiate Http Request Param Object
         RequestParams params = new RequestParams();
         // When Name Edit View, Email Edit View and Password Edit View have values other than Null
@@ -98,6 +113,7 @@ public class Signup extends AppCompatActivity {
                 params.put("email", email);
                 // Put Http parameter password with value of Password Edit View control
                 params.put("phone", phone);
+                params.put("type",type);
                 // Invoke RESTful Web Service with Http parameters
                 invokeWS(params);
             }
