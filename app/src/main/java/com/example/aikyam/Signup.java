@@ -26,6 +26,7 @@ import com.loopj.android.http.RequestParams;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 
 public class Signup extends AppCompatActivity {
@@ -88,34 +89,41 @@ public class Signup extends AppCompatActivity {
 
         // find the radiobutton by returned id
         radioButton = (RadioButton) findViewById(selectedId);
-        String type;
+        String type="";
         if(radioButton.getText()=="Donor")
-            type="1";
+            type=String.valueOf(1);
         else
-            type="2";
+            type=String.valueOf(2);
 
 
         // Instantiate Http Request Param Object
-        RequestParams params = new RequestParams();
+       // RequestParams params = new RequestParams();
+        JSONObject params = new JSONObject();
+
+
         // When Name Edit View, Email Edit View and Password Edit View have values other than Null
         if(Utility.isNotNull(name) && Utility.isNotNull(username) && Utility.isNotNull(location) && Utility.isNotNull(email) && Utility.isNotNull(phone) && Utility.isNotNull(password)){
             // When Email entered is Valid
             if(Utility.validate(email) && rePass.equals(password)){
-                // Put Http parameter name with value of Name Edit View control
-                params.put("name", name);
-                // Put Http parameter name with value of Username Edit View control
-                params.put("username", username);
-                // Put Http parameter name with value of Password Edit View control
-                params.put("password", password);
-                // Put Http parameter name with value of Location Edit View control
-                params.put("location", location);
-                // Put Http parameter username with value of Email Edit View control
-                params.put("email", email);
-                // Put Http parameter password with value of Password Edit View control
-                params.put("phone", phone);
-                params.put("type",type);
-                // Invoke RESTful Web Service with Http parameters
-                invokeWS(params);
+                try {
+                    // Put Http parameter name with value of Name Edit View control
+                    params.put("name", name);
+                    // Put Http parameter name with value of Username Edit View control
+                    params.put("username", username);
+                    // Put Http parameter name with value of Password Edit View control
+                    params.put("password", password);
+                    // Put Http parameter name with value of Location Edit View control
+                    params.put("location", location);
+                    // Put Http parameter username with value of Email Edit View control
+                    params.put("email", email);
+                    // Put Http parameter password with value of Password Edit View control
+                    params.put("phone", phone);
+                    // Invoke RESTful Web Service with Http parameters
+                    invokeWS(params, type);
+                }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             // When Email is invalid
             else{
@@ -136,67 +144,78 @@ public class Signup extends AppCompatActivity {
      *
      * @param params
      */
-    public void invokeWS(RequestParams params){
+    public void invokeWS(JSONObject params,String type){
         // Show Progress Dialog
+        String url="";
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("https://www.google.com",params,new AsyncHttpResponseHandler() {
-        // When the response returned by REST has Http response code '200'
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-            // Hide Progress Dialog
-            prgDialog.hide();
-            try {
-                // JSON Object
-                String str=new String(response);
-                JSONObject obj = new JSONObject(str);
-                // When the JSON response has status boolean value assigned with true
-                if(obj.getBoolean("status")){
-                    // Set Default Values for Edit View controls
-                    setDefaultValues();
-                    // Display successfully registered message using Toast
-                    Toast.makeText(getApplicationContext(), "You are successfully registered!", Toast.LENGTH_LONG).show();
-                }
-                // Else display error message
-                else{
-                    errorMsg.setText(obj.getString("error_msg"));
-                    Toast.makeText(getApplicationContext(), obj.getString("error_msg"), Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+        if(type.equals("1"))
+            url="http://192.168.43.46:8080/proj/user/regD";
+        else if(type.equals("2"))
+            url="http://192.168.43.46:8080/proj/user/regC";
+        try {
+            StringEntity entity = new StringEntity(params.toString());
+            client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {
+                // When the response returned by REST has Http response code '200'
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                   // try {
+                        // JSON Object
+//                        String str=new String(response);
+//                        JSONObject obj = new JSONObject(str);
+                        // When the JSON response has status boolean value assigned with true
+                        if(statusCode==200){
+                            // Set Default Values for Edit View controls
+                            setDefaultValues();
+                            // Display successfully registered message using Toast
+                            Toast.makeText(getApplicationContext(), "You are successfully registered!", Toast.LENGTH_LONG).show();
+                            navigatetoLoginActivity();
+                        }
+                        // Else display error message
 
-            }
+                    /*} catch (JSONException e) {
+                        // TODO Auto-generated catch block
+                        Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+
+                    }*/
+                }
+
+
+                // When the response returned by REST has Http response code other than '200'
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    // When Http response code is '400'
+                    if(statusCode == 400){
+                        Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code is '500'
+                    else if(statusCode == 500){
+                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code other than 400, 500
+                    else{
+                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        catch(Exception e)
+        {
+
         }
 
-
-        // When the response returned by REST has Http response code other than '200'
-        @Override
-        public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-            // Hide Progress Dialog
-            prgDialog.hide();
-            // When Http response code is '404'
-            if(statusCode == 404){
-                Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
-            }
-            // When Http response code is '500'
-            else if(statusCode == 500){
-                Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-            }
-            // When Http response code other than 404, 500
-            else{
-                Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
-            }
-        }
-    });
 }
 
     /**
      * Method which navigates from Register Activity to Login Activity
      */
-    public void navigatetoLoginActivity(View view){
+    public void navigatetoLoginActivity(){
         Intent loginIntent = new Intent(getApplicationContext(),LoginActivity.class);
         // Clears History of Activity
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

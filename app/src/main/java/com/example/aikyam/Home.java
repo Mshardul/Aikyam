@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.content.SharedPreferences;
 
 public class Home extends AppCompatActivity {
 
@@ -24,6 +25,13 @@ public class Home extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    public  void logout(View view){
+        SharedPreferences sharedpreferences = getSharedPreferences(LoginActivity.MyPREFERENCES, getApplicationContext().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedpreferences.edit();
+        editor.clear();
+        editor.commit();
     }
 
 }

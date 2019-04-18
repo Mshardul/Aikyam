@@ -15,6 +15,24 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".Donate"
+            android:label="@string/title_activity_donate"
+            android:parentActivityName=".Donor_Home"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.aikyam.Donor_Home" />
+        </activity>
+        <activity
+            android:name=".Donor_Home"
+            android:label="@string/title_activity_donor__home"
+            android:parentActivityName=".LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.aikyam.LoginActivity" />
+        </activity>
+        <activity
             android:name=".Create_Event"
             android:label="@string/title_activity_create__event"
             android:parentActivityName=".Admin_Home"

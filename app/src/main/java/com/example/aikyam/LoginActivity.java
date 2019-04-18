@@ -3,7 +3,7 @@ package com.example.aikyam;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import android.content.SharedPreferences;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -23,6 +23,7 @@ import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
 import butterknife.ButterKnife;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 /**
  *
@@ -32,7 +33,8 @@ import butterknife.ButterKnife;
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "Login";
     RadioGroup radioGroup;
-    RadioButton radioButton;
+    RadioButton radioButton1;
+    RadioButton radioButton2;
     // Progress Dialog Object
     ProgressDialog prgDialog;
     // Error Msg TextView Object
@@ -41,6 +43,9 @@ public class LoginActivity extends AppCompatActivity {
     EditText emailET;
     // Passwprd Edit View Object
     EditText pwdET;
+    public static final String MyPREFERENCES = "Bin" ;
+    public static final String Username = "username";
+    SharedPreferences sharedpreferences;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +57,8 @@ public class LoginActivity extends AppCompatActivity {
         // Find Password Edit View control by ID
         pwdET = (EditText)findViewById(R.id.password);
         radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, getApplicationContext().MODE_PRIVATE);
+
 
         // Instantiate Progress Dialog object
         prgDialog = new ProgressDialog(this);
@@ -76,32 +83,35 @@ public class LoginActivity extends AppCompatActivity {
         // Get Password Edit View Value
         String password = pwdET.getText().toString();
         // Instantiate Http Request Param Object
-        RequestParams params = new RequestParams();
-        int selectedId = radioGroup.getCheckedRadioButtonId();
-
+//        RequestParams params = new RequestParams();
+        JSONObject params = new JSONObject();
+        //int selectedId = radioGroup.getCheckedRadioButtonId();
+        //Toast.makeText(getApplicationContext(), String.valueOf(selectedId), Toast.LENGTH_LONG).show();
         // find the radiobutton by returned id
-        radioButton = (RadioButton) findViewById(selectedId);
-        String type;
-        if(radioButton.getText()=="Donor")
-            type="1";
-        else
-            type="2";
+        radioButton1 = (RadioButton) findViewById(R.id.donor);
+        radioButton2 = (RadioButton) findViewById(R.id.receiver);
+        String type="";
+        if(radioButton1.isChecked())
+            type=String.valueOf(1);
+        else if(radioButton2.isChecked())
+        type=String.valueOf(2);
         // When Email Edit View and Password Edit View have values other than Null
         if(Utility.isNotNull(email) && Utility.isNotNull(password)){
             // When Email entered is Valid
-            if(Utility.validate(email)){
+
+                try {
                 // Put Http parameter username with value of Email Edit View control
                 params.put("username", email);
                 // Put Http parameter password with value of Password Edit Value control
                 params.put("password", password);
-                params.put("type",type);
                 // Invoke RESTful Web Service with Http parameters
-                invokeWS(params);
+                invokeWS(params,type);
             }
-            // When Email is invalid
-            else{
-                Toast.makeText(getApplicationContext(), "Please enter valid email", Toast.LENGTH_LONG).show();
-            }
+                catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
         } else{
             Toast.makeText(getApplicationContext(), "Please fill the form, don't leave any field blank", Toast.LENGTH_LONG).show();
         }
@@ -113,46 +123,58 @@ public class LoginActivity extends AppCompatActivity {
      *
      * @param params
      */
-    public void invokeWS(RequestParams params){
+    public void invokeWS(JSONObject params, final String type){
         // Show Progress Dialog
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        client.get("http://192.168.2.2:9999/useraccount/login/dologin",params ,new AsyncHttpResponseHandler() {
+        String url="";
+
+        if(type.equals("1"))
+            url="http://192.168.43.46:8080/proj/user/loginD";
+        else if(type.equals("2"))
+            url="http://192.168.43.46:8080/proj/user/loginC";
+        Toast.makeText(getApplicationContext(), url, Toast.LENGTH_LONG).show();
+        try {
+            StringEntity entity = new StringEntity(params.toString());
+            client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {
             // When the response returned by REST has Http response code '200'
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] response) {
                 // Hide Progress Dialog
                 prgDialog.hide();
-                try {
+
                     // JSON Object
-                    String str=new String(response);
-                    JSONObject obj = new JSONObject(str);
+                    //String str=new String(response);
+                    //JSONObject obj = new JSONObject(str);
                     // When the JSON response has status boolean value assigned with true
-                    if(obj.getBoolean("status")){
+                    if(statusCode== 200){
                         Toast.makeText(getApplicationContext(), "You are successfully logged in!", Toast.LENGTH_LONG).show();
+                        SharedPreferences.Editor editor = sharedpreferences.edit();
+
+                        editor.putString(Username, emailET.getText().toString());
+
+                        editor.commit();
                         // Navigate to Home screen
-                        navigateToHomeActivity();
+                        if(type.equals("1"))
+                            navigateToDonorHomeActivity();
+                        else if(type.equals("2"))
+                            navigateToReceiverHomeActivity();
                     }
                     // Else display error message
-                    else{
+                    /*else{
                         errorMsg.setText(obj.getString("error_msg"));
                         Toast.makeText(getApplicationContext(), obj.getString("error_msg"), Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-
+                    }*/
                 }
-            }
+
             // When the response returned by REST has Http response code other than '200'
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
                 // Hide Progress Dialog
                 prgDialog.hide();
-                // When Http response code is '404'
-                if(statusCode == 404){
+                // When Http response code is '400'
+                if(statusCode == 400){
                     Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
                 }
                 // When Http response code is '500'
@@ -164,18 +186,26 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        }); }
+        catch(Exception e)
+        {
+
+        }
     }
 
     /**
      * Method which navigates from Login Activity to Home Activity
      */
-    public void navigateToHomeActivity(){
+    public void navigateToDonorHomeActivity(){
+        Intent homeIntent = new Intent(getApplicationContext(),Donor_Home.class);
+        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(homeIntent);
+    }
+    public void navigateToReceiverHomeActivity(){
         Intent homeIntent = new Intent(getApplicationContext(),Home.class);
         homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(homeIntent);
     }
-
     /**
      * Method gets triggered when Register button is clicked
      *

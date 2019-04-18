@@ -43,4 +43,6 @@
     <string name="title_activity_signup">Register</string>
     <string name="title_activity_admin__home">Admin_Home</string>
     <string name="title_activity_create__event">Create_Event</string>
+    <string name="title_activity_donor__home">Home</string>
+    <string name="title_activity_donate">Donate</string>
 </resources>
