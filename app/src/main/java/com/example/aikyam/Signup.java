@@ -72,6 +72,12 @@ public class Signup extends AppCompatActivity {
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        loginLink.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigatetoLoginActivity();
+            }
+        });
 
 
     }

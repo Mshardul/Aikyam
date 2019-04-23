@@ -201,6 +201,11 @@ public class LoginActivity extends AppCompatActivity {
         homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(homeIntent);
     }
+    public void navigateToDonorHomeActivity(View view){
+        Intent homeIntent = new Intent(getApplicationContext(),Donor_Home.class);
+        homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(homeIntent);
+    }
     public void navigateToReceiverHomeActivity(){
         Intent homeIntent = new Intent(getApplicationContext(),Home.class);
         homeIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

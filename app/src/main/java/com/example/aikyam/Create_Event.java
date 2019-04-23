@@ -84,12 +84,19 @@ public class Create_Event extends AppCompatActivity {
         options.add("Ngo2");
         options.add("Ngo3");
         spinner.setItems(options);
-        //        // Create an ArrayAdapter using the string array and a default spinner layout
 
-        RequestParams params = new RequestParams();
+        JSONObject par=new JSONObject();
+        try {
+            par.put("", "");
+            //options= invokeWS(params);
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
         // When Name Edit View, Email Edit View and Password Edit View have values other than Null
 
-        //options= invokeWS(params);
+
 
 
 //
@@ -159,9 +166,9 @@ public class Create_Event extends AppCompatActivity {
                 });
         AlertDialog alert = builder.create();
 
-        alert.show();
 
-       /* JSONObject params = new JSONObject();
+
+       JSONObject params = new JSONObject();
 
 
 
@@ -171,7 +178,7 @@ public class Create_Event extends AppCompatActivity {
 
                 try {
                     // Put Http parameter name with value of Name Edit View control
-                    params.put("venue", venue_list);
+                    params.put("venue", jsArray);
                     // Put Http parameter name with value of Username Edit View control
                     params.put("date",date );
                     // Put Http parameter name with value of Password Edit View control
@@ -182,7 +189,7 @@ public class Create_Event extends AppCompatActivity {
                 catch (JSONException e) {
                     e.printStackTrace();
                 }
-
+            alert.show();
 
 
         }
@@ -191,9 +198,9 @@ public class Create_Event extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Please fill the form, don't leave any field blank", Toast.LENGTH_LONG).show();
         }
 
-    }*/
     }
-   /* public void invokeW(JSONObject params){
+
+   public void invokeW(JSONObject params){
         // Show Progress Dialog
         String url="";
         prgDialog.show();
@@ -216,7 +223,7 @@ public class Create_Event extends AppCompatActivity {
                     if(statusCode==200){
 
                         // Display successfully registered message using Toast
-                        Toast.makeText(getApplicationContext(), "Event generated Successfully!!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Event created Successfully!!", Toast.LENGTH_LONG).show();
                         navigatetoHomeActivity();
                     }
 
@@ -245,7 +252,7 @@ public class Create_Event extends AppCompatActivity {
         }
         catch(Exception e)
         {
-
+            e.printStackTrace();
         }
 
     }
@@ -253,70 +260,70 @@ public class Create_Event extends AppCompatActivity {
 
 
 
-
-
-
-
-
-    public ArrayList<String> invokeWS(RequestParams params){
+    public ArrayList<String> invokeWS(JSONObject params){
         // Show Progress Dialog
-       final ArrayList<Integer> id=new ArrayList<>();
+
         final ArrayList<String> venue_names=new ArrayList<>();
 
 
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        client.post("https://www.google.com",params,new AsyncHttpResponseHandler() {
-            // When the response returned by REST has Http response code '200'
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                // Hide Progress Dialog
-                prgDialog.hide();
-                try {
-                    // JSON Object
-                    String str=new String(response);
-                    JSONObject jsnobject = new JSONObject(str);
-                    JSONArray jsonArray = jsnobject.getJSONArray("venues");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject ob = jsonArray.getJSONObject(i);
-                        id.add(Integer.parseInt(ob.getString("id")));
-                        venue_names.add(ob.getString("venue"));
+        try {
+            StringEntity entity = new StringEntity(params.toString());
+            client.post(this, "https://www.google.com", entity, "application/json", new AsyncHttpResponseHandler() {
+                // When the response returned by REST has Http response code '200'
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    try {
+                        // JSON Object
+                        String str = new String(response);
+                        JSONObject jsnobject = new JSONObject(str);
+                        JSONArray jsonArray = jsnobject.getJSONArray("venues");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject ob = jsonArray.getJSONObject(i);
+
+                            venue_names.add(ob.getString("venue"));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } catch (JSONException e) {
-                    // TODO Auto-generated catch block
-                    Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-
                 }
-            }
 
 
-            // When the response returned by REST has Http response code other than '200'
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                // Hide Progress Dialog
-                prgDialog.hide();
-                // When Http response code is '404'
-                if(statusCode == 404){
-                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                // When the response returned by REST has Http response code other than '200'
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    // When Http response code is '404'
+                    if (statusCode == 404) {
+                        Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code is '500'
+                    else if (statusCode == 500) {
+                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code other than 404, 500
+                    else {
+                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                    }
                 }
-                // When Http response code is '500'
-                else if(statusCode == 500){
-                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-                }
-                // When Http response code other than 404, 500
-                else{
-                    Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+            });
 
+
+        }
+        catch (Exception e) {
+
+            Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+
+        }
         return venue_names;
-
     }
 
-*/
     private void updateLabel(){
         String myFormat = "MM/dd/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);

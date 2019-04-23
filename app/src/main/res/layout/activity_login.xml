@@ -12,7 +12,7 @@
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/design_default_color_primary">
+        android:background="@color/vpi__bright_foreground_disabled_holo_light">
 
         <LinearLayout
             android:id="@+id/email_login_form"
@@ -115,6 +115,16 @@
                 android:onClick="navigateToRegisterActivity"
                 android:text="No account yet? Create one"
                 android:textSize="16dip" />
+
+            <Button
+                android:id="@+id/donor_home"
+                style="?android:textAppearanceSmall"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:onClick="navigateToDonorHomeActivity"
+                android:text="Donor Home"
+                android:textStyle="bold" />
 
         </LinearLayout>
     </ScrollView>

@@ -9,30 +9,23 @@
             android:icon="@drawable/event"
             android:title="Create Event" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/view_event"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="View Events" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/modify_event"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="Modify Event" />
+
+    </group>
+    <group android:checkableBehavior="single">
+
         <item
-            android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:id="@+id/modify_category"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="Modify Category" />
+
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
 
 </menu>

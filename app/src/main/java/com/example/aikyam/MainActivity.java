@@ -118,12 +118,20 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.about) {
-            // Handle the camera action
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            return true;
         } else if (id == R.id.events) {
+            Intent intent = new Intent(this, getUpcomingEvents.class);
+            startActivity(intent);
+            return true;
 
         } else if (id == R.id.rate) {
 
-        } else if (id == R.id.settings) {
+        } else if (id == R.id.successful) {
+            Intent intent = new Intent(this, getPastEvents.class);
+            startActivity(intent);
+            return true;
 
         } else if (id == R.id.nav_share) {
 

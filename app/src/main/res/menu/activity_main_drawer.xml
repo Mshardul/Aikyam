@@ -11,15 +11,16 @@
         <item
             android:id="@+id/events"
             android:icon="@drawable/events"
-            android:title="Events" />
+            android:title=" Upcoming Events" />
+        <item
+            android:id="@+id/successful"
+            android:icon="@drawable/event"
+            android:title="Successful Events" />
         <item
             android:id="@+id/rate"
             android:icon="@drawable/rate_us"
             android:title="Rate Us" />
-        <item
-            android:id="@+id/settings"
-            android:icon="@drawable/settings"
-            android:title="Settings" />
+
     </group>
 
     <item android:title="Communicate">

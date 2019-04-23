@@ -15,6 +15,40 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".ModifyCategory"
+            android:label="@string/title_activity_modify_category"
+            android:parentActivityName=".Admin_Home"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.aikyam.Admin_Home" />
+        </activity>
+        <activity
+            android:name=".modifyEventInfo"
+            android:label="@string/title_activity_mofify_event_info"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".modifyEvent"
+            android:label="@string/title_activity_modify_event"
+            android:parentActivityName=".Admin_Home"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.aikyam.Admin_Home" />
+        </activity>
+        <activity
+            android:name=".getUpcomingEvents"
+            android:label="@string/title_activity_get_upcoming_events"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".getPastEvents"
+            android:label="@string/title_activity_get_past_events"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".getAllEvents"
+            android:label="@string/title_activity_get_all_events"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".Donate"
             android:label="@string/title_activity_donate"
             android:parentActivityName=".Donor_Home"

@@ -5,12 +5,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Layout;
 import android.view.View;
+import android.view.ViewGroup;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +24,9 @@ import java.util.Locale;
 import java.text.SimpleDateFormat;
 import android.widget.Spinner;
 import android.app.AlertDialog;
+import org.json.JSONArray;
+
+
 import android.widget.SpinnerAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,6 +34,8 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.StringEntity;
+
 import android.content.DialogInterface;
 
 
@@ -37,183 +45,259 @@ import android.widget.ArrayAdapter;
 
 public class Donate extends AppCompatActivity {
 
-    EditText quantity;
 
-    Spinner spinner;
     ProgressDialog prgDialog;
-    TextView errorMsg;
+    ArrayList<String> category_list;
     CheckBox anonymous;
-    Button donate;
+
+
     AlertDialog.Builder builder;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create__event);
+        setContentView(R.layout.activity_donate);
 
 //        errorMsg = (TextView)findViewById(R.id.register_error);
-        quantity=(EditText)findViewById(R.id.quantity);
         prgDialog = new ProgressDialog(this);
         // Set Progress Dialog Text
         prgDialog.setMessage("Please wait...");
         // Set Cancelable as False
         prgDialog.setCancelable(false);
-        donate=(Button)findViewById(R.id.donate);
         builder = new AlertDialog.Builder(this);
 
-        anonymous= (CheckBox) findViewById(R.id.anonymous);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        spinner= (Spinner) findViewById(R.id.category_select);
-// Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayList<String> options=new ArrayList<String>();
+        anonymous=(CheckBox)findViewById(R.id.anonymous);
+        LinearLayout parent = (LinearLayout)findViewById(R.id.dynamic_content);
+        category_list=new ArrayList<>();
+         category_list.add("Books");
+         category_list.add("Clothes");
+         category_list.add("Toys");
+//        LinearLayout l1 = new LinearLayout(this);
+//        parent.addView(l1);
+         for(int i=0;i<category_list.size();i++)
+         {
+            LinearLayout ll = new LinearLayout(this);
+            ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            ll.setOrientation(LinearLayout.HORIZONTAL);
 
-        options.add("Ngo 1");
-        options.add("Ngo 2");
-        options.add("Ngo 3");
+             CheckBox cb = new CheckBox(this);
+             cb.setText(category_list.get(i));
+             cb.setLayoutParams(new LinearLayout.LayoutParams(
+                     0,
+                     LinearLayout.LayoutParams.MATCH_PARENT,
+                     1.0f
+             ));
+             cb.setId(100+i);
 
-// use default spinner item to show options in spinner
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,options);
-// Specify the layout to use when the list of choices appears
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-// Apply the adapter to the spinner
-        spinner.setAdapter(adapter);
+             parent.addView(ll);
+             ll.addView(cb);
+             EditText et = new EditText(this);
+             et.setHint("Quantity");
+             et.setLayoutParams(new LinearLayout.LayoutParams(
+                     0,
+                     LinearLayout.LayoutParams.MATCH_PARENT,
+                     1.0f
+             ));
+             et.setId(i);
+             ll.addView(et);
 
-               FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            
+
+         }
+
     }
 
     public void performDonation(View view){
 
-        String category = String.valueOf(spinner.getSelectedItem());
-        String quantityT=quantity.getText().toString();
+        JSONArray categories;
+        JSONArray quantity;
+        ArrayList<String> cat_list=new ArrayList<>();
+        ArrayList<String> quan_list=new ArrayList<>();
+
+        JSONObject j = new JSONObject();
         String checked="";
-        if(anonymous.isChecked())
-            checked=String.valueOf(1);
-        else
-            checked=String.valueOf(2);
-        builder.setTitle("Alert");
-        builder.setMessage("Category:"+category+"\nQuantity:"+quantityT+"\nAnonymous:"+checked).setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
+        try {
 
-                    }
+            j.put("donorId",String.valueOf(1));
+            CheckBox c;
+            EditText e;
+            for (int i = 0; i < category_list.size(); i++) {
+                c = (CheckBox) findViewById(100+i);
+                if (c.isChecked()) {
+                    e = (EditText) findViewById(i);
+                    cat_list.add(category_list.get(i));
+                    quan_list.add(e.getText().toString());
 
-
-                });
-        AlertDialog alert = builder.create();
-
-        alert.show();
-    }
-
-    /*// Instantiate Http Request Param Object
-    RequestParams params = new RequestParams();
-    // When Name Edit View, Email Edit View and Password Edit View have values other than Null
-    if(Utility.isNotNull(name) && Utility.isNotNull(username) && Utility.isNotNull(location) && Utility.isNotNull(email) && Utility.isNotNull(phone) && Utility.isNotNull(password)){
-        // When Email entered is Valid
-        if(Utility.validate(email) && rePass.equals(password)){
-            // Put Http parameter name with value of Name Edit View control
-            params.put("name", name);
-            // Put Http parameter name with value of Username Edit View control
-            params.put("username", username);
-            // Put Http parameter name with value of Password Edit View control
-            params.put("password", password);
-            // Put Http parameter name with value of Location Edit View control
-            params.put("location", location);
-            // Put Http parameter username with value of Email Edit View control
-            params.put("email", email);
-            // Put Http parameter password with value of Password Edit View control
-            params.put("phone", phone);
-            params.put("type",type);
-            // Invoke RESTful Web Service with Http parameters
-            invokeWS(params);
-        }
-        // When Email is invalid
-        else{
-            if(!Utility.validate(email))
-                Toast.makeText(getApplicationContext(), "Please enter valid email", Toast.LENGTH_LONG).show();
-            else
-                Toast.makeText(getApplicationContext(), "Both the passwords must match", Toast.LENGTH_LONG).show();
-        }
-    }
-    // When any of the Edit View control left blank
-    else{
-        Toast.makeText(getApplicationContext(), "Please fill the form, don't leave any field blank", Toast.LENGTH_LONG).show();
-    }
-
-}
-/**
- * Method that performs RESTful webservice invocations
- *
- * @param params
-
-public void invokeWS(RequestParams params){
-    // Show Progress Dialog
-    prgDialog.show();
-    // Make RESTful webservice call using AsyncHttpClient object
-    AsyncHttpClient client = new AsyncHttpClient();
-    client.get("https://www.google.com",params,new AsyncHttpResponseHandler() {
-        // When the response returned by REST has Http response code '200'
-        @Override
-        public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-            // Hide Progress Dialog
-            prgDialog.hide();
-            try {
-                // JSON Object
-                String str=new String(response);
-                JSONObject obj = new JSONObject(str);
-                // When the JSON response has status boolean value assigned with true
-                if(obj.getBoolean("status")){
-                    // Set Default Values for Edit View controls
-                    setDefaultValues();
-                    // Display successfully registered message using Toast
-                    Toast.makeText(getApplicationContext(), "You are successfully registered!", Toast.LENGTH_LONG).show();
                 }
-                // Else display error message
-                else{
-                    errorMsg.setText(obj.getString("error_msg"));
-                    Toast.makeText(getApplicationContext(), obj.getString("error_msg"), Toast.LENGTH_LONG).show();
-                }
-            } catch (JSONException e) {
-                // TODO Auto-generated catch block
-                Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+
+                categories=new JSONArray(cat_list);
+                quantity=new JSONArray(quan_list);
+                j.put("i_name", categories);
+                j.put("qty",quantity);
+
+                if(anonymous.isChecked())
+                    checked=String.valueOf(1);
+                else
+                    checked=String.valueOf(0);
+                j.put("isAnon",checked);
+            }
+            String json= j.toString();
+            if(Utility.isNotNull(json)){
+//                invokeW(j);
+                builder.setTitle("Alert");
+                builder.setMessage("Json:"+j).setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+
+                            }
+
+
+                        });
+                AlertDialog alert = builder.create();
+
+                alert.show();
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Please fill the form, don't leave any field blank", Toast.LENGTH_LONG).show();
+            }
+        }
+            catch(JSONException e) {
+
                 e.printStackTrace();
 
             }
-        }
 
 
-        // When the response returned by REST has Http response code other than '200'
-        @Override
-        public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-            // Hide Progress Dialog
-            prgDialog.hide();
-            // When Http response code is '404'
-            if(statusCode == 404){
-                Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
-            }
-            // When Http response code is '500'
-            else if(statusCode == 500){
-                Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-            }
-            // When Http response code other than 404, 500
-            else{
-                Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
-            }
-        }
-    });
+
+
+
 }
 
-*/
+    public void invokeW(JSONObject params){
+        // Show Progress Dialog
+        String url="";
+        prgDialog.show();
+        // Make RESTful webservice call using AsyncHttpClient object
+        AsyncHttpClient client = new AsyncHttpClient();
+        url="http://192.168.43.46:8080/proj/user/regD";
+        try {
+            StringEntity entity = new StringEntity(params.toString());
+            client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {
+                // When the response returned by REST has Http response code '200'
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    // try {
+                    // JSON Object
+//                        String str=new String(response);
+//                        JSONObject obj = new JSONObject(str);
+                    // When the JSON response has status boolean value assigned with true
+                    if(statusCode==200){
+
+                        // Display successfully registered message using Toast
+                        Toast.makeText(getApplicationContext(), "Thanks for the Donation.Our representative will contact you shortly :)", Toast.LENGTH_LONG).show();
+                        navigateToHomeActivity();
+                    }
+
+                }
+
+
+                // When the response returned by REST has Http response code other than '200'
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    // When Http response code is '400'
+                    if(statusCode == 400){
+                        Toast.makeText(getApplicationContext(), "Error Creating Donation!!", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code is '500'
+                    else if(statusCode == 500){
+                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code other than 400, 500
+                    else{
+                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
 
 
 
+
+    public ArrayList<String> invokeWS(RequestParams params){
+        // Show Progress Dialog
+
+        final ArrayList<String> venue_names=new ArrayList<>();
+
+
+        prgDialog.show();
+        // Make RESTful webservice call using AsyncHttpClient object
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.post("https://www.google.com",params,new AsyncHttpResponseHandler() {
+            // When the response returned by REST has Http response code '200'
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                // Hide Progress Dialog
+                prgDialog.hide();
+                try {
+                    // JSON Object
+                    String str=new String(response);
+                    JSONObject jsnobject = new JSONObject(str);
+                    JSONArray jsonArray = jsnobject.getJSONArray("venues");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject ob = jsonArray.getJSONObject(i);
+
+                        venue_names.add(ob.getString("venue"));
+                    }
+                } catch (JSONException e) {
+
+                    Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+
+                }
+            }
+
+
+            // When the response returned by REST has Http response code other than '200'
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                // Hide Progress Dialog
+                prgDialog.hide();
+                // When Http response code is '404'
+                if(statusCode == 404){
+                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                }
+                // When Http response code is '500'
+                else if(statusCode == 500){
+                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                }
+                // When Http response code other than 404, 500
+                else{
+                    Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        return venue_names;
+
+    }
+
+    public void navigateToHomeActivity(){
+        Intent loginIntent = new Intent(getApplicationContext(),Donor_Home.class);
+        // Clears History of Activity
+        loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(loginIntent);
+    }
 }

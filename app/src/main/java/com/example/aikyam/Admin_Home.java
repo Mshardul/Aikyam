@@ -75,7 +75,6 @@ public class Admin_Home extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -86,16 +85,20 @@ public class Admin_Home extends AppCompatActivity
             startActivity(intent);
             return true;
         }
-        else if (id == R.id.nav_gallery) {
+        else if (id == R.id.view_event) {
+            Intent intent = new Intent(this, getAllEvents.class);
+            startActivity(intent);
+            return true;
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.modify_event) {
+            Intent intent = new Intent(this, modifyEvent.class);
+            startActivity(intent);
+            return true;
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        }  else if (id == R.id.modify_category) {
+            Intent intent = new Intent(this, ModifyCategory.class);
+            startActivity(intent);
+            return true;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
