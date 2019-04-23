@@ -97,8 +97,8 @@ public class AdapterModify extends RecyclerView.Adapter<AdapterModify.MyViewHold
             public void onClick(View v) {
                 Intent loginIntent = new Intent(v.getContext(),modifyEventInfo.class);
 //            loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                loginIntent.putExtra("e_id",dataSet.get(listPosition).getId());
-                loginIntent.putExtra("cname",dataSet.get(listPosition).getVenue());
+                loginIntent.putExtra("e_id",dataSet.get(holder.getAdapterPosition()).getId());
+                loginIntent.putExtra("cname",dataSet.get(holder.getAdapterPosition()).getVenue());
 //            loginIntent.putExtra("desc",desc);
 //            loginIntent.putExtra("date",date);
 
