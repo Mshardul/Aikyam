@@ -62,17 +62,17 @@ public class AdapterModify extends RecyclerView.Adapter<AdapterModify.MyViewHold
 
 
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
+    public void onBindViewHolder(final MyViewHolder holder,final int listPosition) {
 
         TextView textViewName = holder.textViewName;
         TextView textViewVersion = holder.textViewVersion;
         ImageView imageView = holder.imageViewIcon;
         CardView c=holder.cv;
         final TextView desc=holder.desc;
-        textViewName.setText(dataSet.get(listPosition).getVenue());
-        textViewVersion.setText(dataSet.get(listPosition).getDate());
-        imageView.setImageResource(dataSet.get(listPosition).getImage());
-        desc.setText(dataSet.get(listPosition).getDesc());
+        textViewName.setText(dataSet.get(holder.getAdapterPosition()).getVenue());
+        textViewVersion.setText(dataSet.get(holder.getAdapterPosition()).getDate());
+        imageView.setImageResource(dataSet.get(holder.getAdapterPosition()).getImage());
+        desc.setText(dataSet.get(holder.getAdapterPosition()).getDesc());
         final TextView text = holder.more;
 //        final TextView des=holder.desc;
         text.setOnClickListener(new View.OnClickListener() {
@@ -80,13 +80,13 @@ public class AdapterModify extends RecyclerView.Adapter<AdapterModify.MyViewHold
             public void onClick(View v) {
                 if(state==false)
                 {
-                    desc.setText(dataSet.get(listPosition).fullDesc());
+                    desc.setText(dataSet.get(holder.getAdapterPosition()).fullDesc());
                     text.setText("Less");
                     state=true;
                 }
                 else
                 {
-                    desc.setText(dataSet.get(listPosition).getDesc());
+                    desc.setText(dataSet.get(holder.getAdapterPosition()).getDesc());
                     text.setText("More");
                     state=false;
                 }
