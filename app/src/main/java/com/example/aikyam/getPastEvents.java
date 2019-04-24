@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
 import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
@@ -35,7 +37,7 @@ public class getPastEvents extends AppCompatActivity {
 
     private static RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    private static RecyclerView recyclerView;
+    private  RecyclerView recyclerView;
     private static ArrayList<DataModel> data;
     static View.OnClickListener myOnClickListener;
     private static ArrayList<Integer> removedItems;
@@ -49,7 +51,7 @@ public class getPastEvents extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_get_all_events);
+        setContentView(R.layout.activity_get_past_events);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         myOnClickListener = new MyOnClickListener(this);
@@ -62,20 +64,28 @@ public class getPastEvents extends AppCompatActivity {
 //        recyclerView.setItemAnimator(new DefaultItemAnimator());
         description=(TextView)findViewById(R.id.desc);
         data = new ArrayList<DataModel>();
-        for (int i = 0; i < MyData.drawableArray.length; i++) {
-            String s="a";
-            String d="2018/03/15";
-            String e_id=String.valueOf(1);
-            String des="jfgbxmnbxvckvbdjxchnvb dshgfsdkhgfdkj hdshgdf<sljgfhclk hfdgfskhjdkghf haudkfjhsdfskjgh hdksjfhksdjghk";
-            data.add(new DataModel(
-                    s,des,d,MyData.drawableArray[i],e_id
-            ));
+//        for (int i = 0; i < MyData.drawableArray.length; i++) {
+//            String s="a";
+//            String d="2018/03/15";
+//            String e_id=String.valueOf(1);
+//            String des="jfgbxmnbxvckvbdjxchnvb dshgfsdkhgfdkj hdshgdf<sljgfhclk hfdgfskhjdkghf haudkfjhsdfskjgh hdksjfhksdjghk";
+//            data.add(new DataModel(
+//                    s,des,d,MyData.drawableArray[i],e_id
+//            ));
+//        }
+
+//        removedItems = new ArrayList<Integer>();
+        JSONObject par=new JSONObject();
+        try {
+            par.put("", "");
+            invokeWS(par);
+
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
         }
 
-        removedItems = new ArrayList<Integer>();
-
-        adapter = new CustomAdapter(data);
-        recyclerView.setAdapter(adapter);
 
 
     }
@@ -115,28 +125,32 @@ public class getPastEvents extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         try {
             StringEntity entity = new StringEntity(params.toString());
-            client.post(this, "https://www.google.com", entity, "application/json", new AsyncHttpResponseHandler() {
+            client.post(this, "http://172.16.130.228:8080/proj/event/getPast", entity, "application/json", new JsonHttpResponseHandler() {
                 // When the response returned by REST has Http response code '200'
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                     // Hide Progress Dialog
 //                prgDialog.hide();
                     try {
-                        // JSON Object
-                        String str=new String(response);
-                        JSONObject jsnobject = new JSONObject(str);
-                        JSONArray jsonArray = jsnobject.getJSONArray("events");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject ob = jsonArray.getJSONObject(i);
+
+//                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+
+//                    JSONObject jsnobject = new JSONObject(str);
+
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject ob = response.getJSONObject(i);
                             e_id=ob.getString("e_id");
                             venue=ob.getString("c_name");
-                            date=ob.getString("date");
-                            desc=ob.getString("desc");
+                            date=ob.getString("e_date");
+                            desc=ob.getString("descr");
                             data.add(new DataModel(
                                     venue,desc,date,MyData.drawableArray[i],e_id
                             ));
 
                         }
+                        adapter = new CustomAdapter(data);
+                        recyclerView.setAdapter(adapter);
+
                     } catch (JSONException e) {
 
                         Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
@@ -148,7 +162,7 @@ public class getPastEvents extends AppCompatActivity {
 
                 // When the response returned by REST has Http response code other than '200'
                 @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                     // Hide Progress Dialog
 //                prgDialog.hide();
                     // When Http response code is '404'

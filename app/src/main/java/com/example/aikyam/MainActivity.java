@@ -126,16 +126,12 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             return true;
 
-        } else if (id == R.id.rate) {
+        } else if (id == R.id.ContactUs) {
 
         } else if (id == R.id.successful) {
             Intent intent = new Intent(this, getPastEvents.class);
             startActivity(intent);
             return true;
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
 
         }
 

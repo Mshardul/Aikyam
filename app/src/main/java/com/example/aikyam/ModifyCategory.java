@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import  android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
@@ -32,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -52,6 +55,7 @@ public class ModifyCategory extends AppCompatActivity {
 
     AlertDialog.Builder builder;
     EditText et;
+    LinearLayout parent;
 
 
 
@@ -71,64 +75,59 @@ public class ModifyCategory extends AppCompatActivity {
         et=(EditText)findViewById(R.id.addNew);
 
         //        anonymous=(CheckBox)findViewById(R.id.anonymous);
-        LinearLayout parent = (LinearLayout)findViewById(R.id.dynamic);
+        parent = (LinearLayout)findViewById(R.id.dynamic);
         category_list=new ArrayList<>();
-        category_list.add("Books");
-        category_list.add("Clothes");
-        category_list.add("Toys");
-//        LinearLayout l1 = new LinearLayout(this);
-//        parent.addView(l1);
-        for(int i=0;i<category_list.size();i++)
-        {
-
-
-            CheckBox cb = new CheckBox(this);
-            cb.setText(category_list.get(i));
-            cb.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-
-            ));
-            cb.setId(200+i);
-
-            parent.addView(cb);
-
-
-
+//        category_list.add("Books");
+//        category_list.add("Clothes");
+//        category_list.add("Toys");
+        JSONObject par=new JSONObject();
+        try {
+            par.put("", "");
+            category_list= invokeWS(par);
 
         }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+//        LinearLayout l1 = new LinearLayout(this);
+//        parent.addView(l1);
+
 
     }
 
-    public void performModification(View view){
+    public void performDelete(View view){
 
-        JSONArray categories;
-        ArrayList<String> cat_list=new ArrayList<>();
-        String add=et.getText().toString();
+
+//        String add=et.getText().toString();
+        String url="http://172.16.130.228:8080/proj/item/delete";
 
         JSONObject j = new JSONObject();
+
+
         try {
 
 
 
-            CheckBox c;
+            RadioButton c;
             for (int i = 0; i < category_list.size(); i++) {
-                c = (CheckBox) findViewById(200+i);
+                c = (RadioButton) findViewById(200+i);
+
                 if (c.isChecked()) {
-                    cat_list.add(category_list.get(i));
 
+                    j.put("i_name",category_list.get(i));
                 }
+                j.put("qty",String.valueOf(1000));
 
-                categories=new JSONArray(cat_list);
-                j.put("delete", categories);
-                j.put("add", add);
+
+
 
 
 
             }
             String json= j.toString();
             if(Utility.isNotNull(json)){
-//                invokeW(j);
+                invokeW(j,url);
                 builder.setTitle("Alert");
                 builder.setMessage("Json:"+j).setCancelable(false)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -158,14 +157,64 @@ public class ModifyCategory extends AppCompatActivity {
 
 
     }
+    public void performAdd(View view){
 
-    public void invokeW(JSONObject params){
+
+        String add=et.getText().toString();
+        String url="http://172.16.130.228:8080/proj/item/add";
+
+        JSONObject j = new JSONObject();
+        try {
+
+
+
+           j.put("i_name",add);
+           j.put("qty",String.valueOf(1));
+
+
+
+            }
+        catch(JSONException e) {
+
+            e.printStackTrace();
+
+        }
+
+        String json= j.toString();
+            if(Utility.isNotNull(json)){
+                invokeW(j,url);
+                builder.setTitle("Alert");
+                builder.setMessage("Json:"+j).setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                finish();
+
+                            }
+
+
+                        });
+                AlertDialog alert = builder.create();
+
+                alert.show();
+            }
+            else{
+                Toast.makeText(getApplicationContext(), "Please fill the form, don't leave any field blank", Toast.LENGTH_LONG).show();
+            }
+        }
+
+
+
+
+
+
+
+    public void invokeW(JSONObject params,String url){
         // Show Progress Dialog
-        String url="";
+//        String url="";
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        url="http://192.168.43.46:8080/proj/user/regD";
+//        url="http://192.168.43.46:8080/proj/user/regD";
         try {
             StringEntity entity = new StringEntity(params.toString());
             client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {
@@ -183,7 +232,7 @@ public class ModifyCategory extends AppCompatActivity {
 
                         // Display successfully registered message using Toast
                         Toast.makeText(getApplicationContext(), "Event Modified Successfully:)", Toast.LENGTH_LONG).show();
-                        navigateToHomeActivity();
+                        navigateToSelfHomeActivity();
                     }
 
                 }
@@ -219,7 +268,7 @@ public class ModifyCategory extends AppCompatActivity {
 
 
 
-    public ArrayList<String> invokeWS(RequestParams params){
+    public ArrayList<String> invokeWS(JSONObject params){
         // Show Progress Dialog
 
         final ArrayList<String> venue_names=new ArrayList<>();
@@ -228,57 +277,91 @@ public class ModifyCategory extends AppCompatActivity {
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        client.post("https://www.google.com",params,new AsyncHttpResponseHandler() {
-            // When the response returned by REST has Http response code '200'
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-                // Hide Progress Dialog
-                prgDialog.hide();
-                try {
-                    // JSON Object
-                    String str=new String(response);
-                    JSONObject jsnobject = new JSONObject(str);
-                    JSONArray jsonArray = jsnobject.getJSONArray("venues");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject ob = jsonArray.getJSONObject(i);
+        try {
+            StringEntity entity = new StringEntity(params.toString());
+            client.post(this, "http://172.16.130.228:8080/proj/item/getAll", entity, "application/json", new JsonHttpResponseHandler() {
+                // When the response returned by REST has Http response code '200'
+                @Override
+                public void onSuccess(int statusCode, Header[] headers,JSONArray response) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    try {
+                        // JSON Object
+//                        String str = new String(response);
+//                        JSONArray jsonArray = new JSONArray(str);
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject ob = response.getJSONObject(i);
 
-                        venue_names.add(ob.getString("venue"));
+                            venue_names.add(ob.getString("i_name"));
+                        }
+                        RadioGroup group = new RadioGroup(getApplicationContext());
+                        group.setOrientation(RadioGroup.VERTICAL);
+                        group.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT));
+                        parent.addView(group);
+                        for(int i=0;i<category_list.size();i++)
+                        {
+
+
+//            CheckBox cb = new CheckBox(this);
+//            cb.setText(category_list.get(i));
+//
+//
+//            ));
+//            cb.setId(200+i);
+                            RadioButton btn = new RadioButton(getApplicationContext());
+                            btn.setText(category_list.get(i));
+                            btn.setId(200+i);
+
+                            group.addView(btn);
+
+
+
+
+                        }
+                    } catch (JSONException e) {
+
+                        Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+                        e.printStackTrace();
+
                     }
-                } catch (JSONException e) {
-
-                    Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
-                    e.printStackTrace();
-
                 }
-            }
 
 
-            // When the response returned by REST has Http response code other than '200'
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-                // Hide Progress Dialog
-                prgDialog.hide();
-                // When Http response code is '404'
-                if(statusCode == 404){
-                    Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                // When the response returned by REST has Http response code other than '200'
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable e,JSONArray errorResponse) {
+                    // Hide Progress Dialog
+                    prgDialog.hide();
+                    // When Http response code is '404'
+                    if(statusCode == 404){
+                        Toast.makeText(getApplicationContext(), "Requested resource not found", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code is '500'
+                    else if(statusCode == 500){
+                        Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
+                    }
+                    // When Http response code other than 404, 500
+                    else{
+                        Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
+                    }
                 }
-                // When Http response code is '500'
-                else if(statusCode == 500){
-                    Toast.makeText(getApplicationContext(), "Something went wrong at server end", Toast.LENGTH_LONG).show();
-                }
-                // When Http response code other than 404, 500
-                else{
-                    Toast.makeText(getApplicationContext(), "Unexpected Error occcured! [Most common Error: Device might not be connected to Internet or remote server is not up and running]", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
+            });
 
+        }
+        catch (Exception e) {
+
+            Toast.makeText(getApplicationContext(), "Error Occured [Server's JSON response might be invalid]!", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+
+        }
         return venue_names;
 
     }
 
-    public void navigateToHomeActivity(){
-        Intent loginIntent = new Intent(getApplicationContext(),Donor_Home.class);
+    public void navigateToSelfHomeActivity(){
+        Intent loginIntent = new Intent(getApplicationContext(),ModifyCategory.class);
         // Clears History of Activity
         loginIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(loginIntent);

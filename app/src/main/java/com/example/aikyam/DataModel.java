@@ -32,7 +32,7 @@ public class DataModel {
     }
 
     public String getDesc() {
-        return desc.substring(0,50)+"....";
+        return desc.substring(0,5)+"....";
     }
 
     public int getImage() {

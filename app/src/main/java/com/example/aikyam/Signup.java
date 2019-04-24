@@ -33,7 +33,8 @@ public class Signup extends AppCompatActivity {
     private static final String TAG = "Signup";
 
     RadioGroup radioGroup;
-    RadioButton radioButton;
+    RadioButton radioButton1;
+    RadioButton radioButton2;
     ProgressDialog prgDialog;
     TextView errorMsg;
     EditText nameT;
@@ -94,11 +95,12 @@ public class Signup extends AppCompatActivity {
         int selectedId = radioGroup.getCheckedRadioButtonId();
 
         // find the radiobutton by returned id
-        radioButton = (RadioButton) findViewById(selectedId);
+        radioButton1 = (RadioButton) findViewById(R.id.donor);
+        radioButton2 = (RadioButton) findViewById(R.id.receiver);
         String type="";
-        if(radioButton.getText()=="Donor")
+        if(radioButton1.isChecked())
             type=String.valueOf(1);
-        else
+        else if(radioButton2.isChecked())
             type=String.valueOf(2);
 
 
@@ -157,9 +159,9 @@ public class Signup extends AppCompatActivity {
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
         if(type.equals("1"))
-            url="http://192.168.43.46:8080/proj/user/regD";
+            url="http://172.16.130.228:8080/proj/user/regD";
         else if(type.equals("2"))
-            url="http://192.168.43.46:8080/proj/user/regC";
+            url="http://172.16.130.228:8080/proj/user/regC";
         try {
             StringEntity entity = new StringEntity(params.toString());
             client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {

@@ -35,6 +35,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import cz.msebera.android.httpclient.Header;
 import android.content.DialogInterface;
@@ -80,15 +81,16 @@ public class Create_Event extends AppCompatActivity {
         setSupportActionBar(toolbar);
         spinner = (MultiSelectionSpinner) findViewById(R.id.venue_select);
 
-        options.add("Ngo1");
-        options.add("Ngo2");
-        options.add("Ngo3");
-        spinner.setItems(options);
+//        options.add("Ngo1");
+//        options.add("Ngo2");
+//        options.add("Ngo3");
+
 
         JSONObject par=new JSONObject();
         try {
             par.put("", "");
-            //options= invokeWS(params);
+            options= invokeWS(par);
+
         }
         catch (JSONException e)
         {
@@ -154,17 +156,6 @@ public class Create_Event extends AppCompatActivity {
         String date = select_date.getText().toString();
         String description = desc.getText().toString();
 
-        builder.setTitle("Alert");
-        builder.setMessage("venue:" + s + "\ndate:" + date + "\ndescription:" + description).setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        finish();
-
-                    }
-
-
-                });
-        AlertDialog alert = builder.create();
 
 
 
@@ -178,18 +169,31 @@ public class Create_Event extends AppCompatActivity {
 
                 try {
                     // Put Http parameter name with value of Name Edit View control
-                    params.put("venue", jsArray);
+                    params.put("c_name", jsArray);
                     // Put Http parameter name with value of Username Edit View control
                     params.put("date",date );
                     // Put Http parameter name with value of Password Edit View control
-                    params.put("description", description);
+                    params.put("descr", description);
+
+                    builder.setTitle("Alert");
+                    builder.setMessage(params.toString()).setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    finish();
+
+                                }
+
+
+                            });
+                    AlertDialog alert = builder.create();
+                    alert.show();
 
                     invokeW(params);
                 }
                 catch (JSONException e) {
                     e.printStackTrace();
                 }
-            alert.show();
+
 
 
         }
@@ -206,7 +210,7 @@ public class Create_Event extends AppCompatActivity {
         prgDialog.show();
         // Make RESTful webservice call using AsyncHttpClient object
         AsyncHttpClient client = new AsyncHttpClient();
-        url="http://192.168.43.46:8080/proj/user/regD";
+        url="http://172.16.130.228:8080/proj/event/create";
         try {
             StringEntity entity = new StringEntity(params.toString());
             client.post(this, url, entity, "application/json",new AsyncHttpResponseHandler() {
@@ -271,22 +275,21 @@ public class Create_Event extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         try {
             StringEntity entity = new StringEntity(params.toString());
-            client.post(this, "https://www.google.com", entity, "application/json", new AsyncHttpResponseHandler() {
+            client.post(this, "http://172.16.130.228:8080/proj/user/getListC", entity, "application/json", new JsonHttpResponseHandler() {
                 // When the response returned by REST has Http response code '200'
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+                public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                     // Hide Progress Dialog
                     prgDialog.hide();
                     try {
                         // JSON Object
-                        String str = new String(response);
-                        JSONObject jsnobject = new JSONObject(str);
-                        JSONArray jsonArray = jsnobject.getJSONArray("venues");
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject ob = jsonArray.getJSONObject(i);
+//                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                        for (int i = 0; i < response.length(); i++) {
+                            JSONObject ob = response.getJSONObject(i);
 
-                            venue_names.add(ob.getString("venue"));
+                            venue_names.add(ob.getString("username"));
                         }
+                        spinner.setItems(options);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -295,7 +298,7 @@ public class Create_Event extends AppCompatActivity {
 
                 // When the response returned by REST has Http response code other than '200'
                 @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+                public void onFailure(int statusCode, Header[] headers, Throwable e, JSONArray errorResponse ) {
                     // Hide Progress Dialog
                     prgDialog.hide();
                     // When Http response code is '404'
@@ -325,7 +328,7 @@ public class Create_Event extends AppCompatActivity {
     }
 
     private void updateLabel(){
-        String myFormat = "MM/dd/yy"; //In which you need put here
+        String myFormat = "yyyy-MM-dd"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
 
         select_date.setText(sdf.format(myCalendar.getTime()));

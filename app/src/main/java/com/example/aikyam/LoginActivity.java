@@ -131,9 +131,9 @@ public class LoginActivity extends AppCompatActivity {
         String url="";
 
         if(type.equals("1"))
-            url="http://192.168.43.46:8080/proj/user/loginD";
+            url="http://172.16.130.228:8080/proj/user/loginD";
         else if(type.equals("2"))
-            url="http://192.168.43.46:8080/proj/user/loginC";
+            url="http://172.16.130.228:8080/proj/user/loginC";
         Toast.makeText(getApplicationContext(), url, Toast.LENGTH_LONG).show();
         try {
             StringEntity entity = new StringEntity(params.toString());
