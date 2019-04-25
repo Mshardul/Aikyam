@@ -154,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         editor.putString(Username, emailET.getText().toString());
 
-                        editor.commit();
+                        editor.apply();
                         // Navigate to Home screen
                         if(type.equals("1"))
                             navigateToDonorHomeActivity();
@@ -189,7 +189,7 @@ public class LoginActivity extends AppCompatActivity {
         }); }
         catch(Exception e)
         {
-
+            e.printStackTrace();
         }
     }
 

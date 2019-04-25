@@ -14,9 +14,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.content.SharedPreferences;
 import android.view.MenuItem;
+import android.widget.ImageView;
+
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
 
 public class Donor_Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    CarouselView carouselView;
+    CarouselView customCarouselView;
+
+    int[] sampleImages = {R.drawable.image_1, R.drawable.image_2, R.drawable.image_3, R.drawable.image_4, R.drawable.image_5};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +50,20 @@ public class Donor_Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        carouselView = (CarouselView) findViewById(R.id.carouselView);
+        carouselView.setPageCount(sampleImages.length);
+
+        carouselView.setImageListener(imageListener);
     }
+    ImageListener imageListener = new ImageListener() {
+        @Override
+        public  void setImageForPosition(int position, ImageView imageView) {
+
+            //Picasso.with(getApplicationContext()).load(sampleNetworkImageURLs[position]).placeholder(sampleImages[0]).error(sampleImages[3]).fit().centerCrop().into(imageView);
+
+            imageView.setImageResource(sampleImages[position]);
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -87,15 +108,9 @@ public class Donor_Home extends AppCompatActivity
             Intent intent = new Intent(this, Donate.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.profile) {
 
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.stats) {
 
         }
 
@@ -107,6 +122,10 @@ public class Donor_Home extends AppCompatActivity
         SharedPreferences sharedpreferences = getSharedPreferences(LoginActivity.MyPREFERENCES, getApplicationContext().MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+
+
     }
 }

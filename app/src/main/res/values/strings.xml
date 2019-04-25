@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Aikyam</string>
+    <string name="app_info_title">About Us</string>
+    <string name="app_info">We, at Aikyam, believe in uplifting the needy.  We are a team of young and driven individuals, with only one aim: to help those who need it the most. We facilitate the transfer of resources like clothes and books and many more from those who have it in excess to those who need it the most. </string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -51,4 +53,5 @@
     <string name="title_activity_modify_event">Modify Event</string>
     <string name="title_activity_mofify_event_info">Event Info</string>
     <string name="title_activity_modify_category">Modify Category</string>
+    <string name="title_activity_contact_us">Contact Us</string>
 </resources>
